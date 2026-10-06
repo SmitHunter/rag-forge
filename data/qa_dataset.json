@@ -1,0 +1,538 @@
+{
+  "name": "Classic Literature QA - Hard Evaluation Set",
+  "description": "Challenging QA pairs for rigorous RAG evaluation: includes paraphrased questions, multi-hop reasoning, cross-chunk answers, near-duplicate distractors, and unanswerable questions.",
+  "examples": [
+    {
+      "id": "easy_1",
+      "question": "What is the famous opening line of Pride and Prejudice?",
+      "answer": "It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.",
+      "relevant_doc_ids": ["pride_and_prejudice"],
+      "metadata": {"difficulty": "easy", "type": "direct"}
+    },
+    {
+      "id": "easy_2",
+      "question": "What is Sherlock Holmes's address in London?",
+      "answer": "221B Baker Street",
+      "relevant_doc_ids": ["the_adventures_of_sherlock_holmes"],
+      "metadata": {"difficulty": "easy", "type": "direct"}
+    },
+    {
+      "id": "easy_3",
+      "question": "What is the opening word of Moby Dick?",
+      "answer": "Call me Ishmael.",
+      "relevant_doc_ids": ["moby_dick"],
+      "metadata": {"difficulty": "easy", "type": "direct"}
+    },
+    {
+      "id": "easy_4",
+      "question": "How does Alice enter Wonderland?",
+      "answer": "Alice falls down a rabbit hole while chasing the White Rabbit.",
+      "relevant_doc_ids": ["alices_adventures_in_wonderland"],
+      "metadata": {"difficulty": "easy", "type": "direct"}
+    },
+    {
+      "id": "easy_5",
+      "question": "Who created the monster in Frankenstein?",
+      "answer": "Victor Frankenstein created the monster through scientific experiments.",
+      "relevant_doc_ids": ["frankenstein"],
+      "metadata": {"difficulty": "easy", "type": "direct"}
+    },
+    {
+      "id": "para_1",
+      "question": "Which wealthy gentleman initially appears arrogant but later proves honorable in Austen's novel?",
+      "answer": "Mr. Darcy, who initially seems proud and disagreeable but reveals his true honorable character.",
+      "relevant_doc_ids": ["pride_and_prejudice"],
+      "metadata": {"difficulty": "medium", "type": "paraphrased"}
+    },
+    {
+      "id": "para_2",
+      "question": "What logical methodology does the Baker Street detective employ to unravel mysteries?",
+      "answer": "Sherlock Holmes uses deductive reasoning and careful observation of details others overlook.",
+      "relevant_doc_ids": ["the_adventures_of_sherlock_holmes"],
+      "metadata": {"difficulty": "medium", "type": "paraphrased"}
+    },
+    {
+      "id": "para_3",
+      "question": "What obsession drives the captain of the Pequod throughout the whaling voyage?",
+      "answer": "Captain Ahab is obsessed with hunting and killing Moby Dick, the white whale that took his leg.",
+      "relevant_doc_ids": ["moby_dick"],
+      "metadata": {"difficulty": "medium", "type": "paraphrased"}
+    },
+    {
+      "id": "para_4",
+      "question": "Which feline character possesses the unusual ability to vanish while leaving its smile visible?",
+      "answer": "The Cheshire Cat can disappear gradually, leaving only its grin visible.",
+      "relevant_doc_ids": ["alices_adventures_in_wonderland"],
+      "metadata": {"difficulty": "medium", "type": "paraphrased"}
+    },
+    {
+      "id": "para_5",
+      "question": "What scientific ambition led a young student at Ingolstadt to create an artificial being?",
+      "answer": "Victor Frankenstein's ambition to discover the secrets of life and death led him to create the monster.",
+      "relevant_doc_ids": ["frankenstein"],
+      "metadata": {"difficulty": "medium", "type": "paraphrased"}
+    },
+    {
+      "id": "para_6",
+      "question": "In the Bennet household, which daughter is considered the most sensible and witty?",
+      "answer": "Elizabeth Bennet is considered the most sensible and witty of the Bennet daughters.",
+      "relevant_doc_ids": ["pride_and_prejudice"],
+      "metadata": {"difficulty": "medium", "type": "paraphrased"}
+    },
+    {
+      "id": "para_7",
+      "question": "What beverage-related gathering features a dormant rodent and an eccentric hat-maker?",
+      "answer": "The Mad Tea Party features the Dormouse and the Mad Hatter.",
+      "relevant_doc_ids": ["alices_adventures_in_wonderland"],
+      "metadata": {"difficulty": "medium", "type": "paraphrased"}
+    },
+    {
+      "id": "para_8",
+      "question": "Who serves as the narrator's medical companion and chronicler of investigative cases?",
+      "answer": "Dr. John Watson is Holmes's companion and the chronicler of his cases.",
+      "relevant_doc_ids": ["the_adventures_of_sherlock_holmes"],
+      "metadata": {"difficulty": "medium", "type": "paraphrased"}
+    },
+    {
+      "id": "detail_1",
+      "question": "What is the name of Mr. Bingley's estate in Pride and Prejudice?",
+      "answer": "Netherfield Park",
+      "relevant_doc_ids": ["pride_and_prejudice"],
+      "metadata": {"difficulty": "hard", "type": "specific_detail"}
+    },
+    {
+      "id": "detail_2",
+      "question": "What is the name of the ship's first mate in Moby Dick?",
+      "answer": "Starbuck is the first mate of the Pequod.",
+      "relevant_doc_ids": ["moby_dick"],
+      "metadata": {"difficulty": "hard", "type": "specific_detail"}
+    },
+    {
+      "id": "detail_3",
+      "question": "What game does Alice play with the Queen of Hearts?",
+      "answer": "Alice plays croquet with the Queen of Hearts, using flamingos as mallets and hedgehogs as balls.",
+      "relevant_doc_ids": ["alices_adventures_in_wonderland"],
+      "metadata": {"difficulty": "hard", "type": "specific_detail"}
+    },
+    {
+      "id": "detail_4",
+      "question": "What is the name of Frankenstein's younger brother who is murdered?",
+      "answer": "William Frankenstein is Victor's younger brother who is murdered by the monster.",
+      "relevant_doc_ids": ["frankenstein"],
+      "metadata": {"difficulty": "hard", "type": "specific_detail"}
+    },
+    {
+      "id": "detail_5",
+      "question": "In which Sherlock Holmes story does a snake play a crucial role?",
+      "answer": "The Adventure of the Speckled Band features a deadly snake as the murder weapon.",
+      "relevant_doc_ids": ["the_adventures_of_sherlock_holmes"],
+      "metadata": {"difficulty": "hard", "type": "specific_detail"}
+    },
+    {
+      "id": "detail_6",
+      "question": "What card soldiers are painting the roses in Wonderland?",
+      "answer": "The Two, Five, and Seven of Spades are painting the white roses red.",
+      "relevant_doc_ids": ["alices_adventures_in_wonderland"],
+      "metadata": {"difficulty": "hard", "type": "specific_detail"}
+    },
+    {
+      "id": "detail_7",
+      "question": "What is the name of the clergyman who proposes to Elizabeth Bennet?",
+      "answer": "Mr. Collins, a pompous clergyman and heir to Longbourn, proposes to Elizabeth.",
+      "relevant_doc_ids": ["pride_and_prejudice"],
+      "metadata": {"difficulty": "hard", "type": "specific_detail"}
+    },
+    {
+      "id": "detail_8",
+      "question": "What is Queequeg's occupation before joining the Pequod?",
+      "answer": "Queequeg was a harpooner and the son of a Pacific island chief.",
+      "relevant_doc_ids": ["moby_dick"],
+      "metadata": {"difficulty": "hard", "type": "specific_detail"}
+    },
+    {
+      "id": "detail_9",
+      "question": "Where does Victor Frankenstein first see his creation come to life?",
+      "answer": "Victor brings his creation to life in his laboratory at the University of Ingolstadt.",
+      "relevant_doc_ids": ["frankenstein"],
+      "metadata": {"difficulty": "hard", "type": "specific_detail"}
+    },
+    {
+      "id": "detail_10",
+      "question": "What scandal involving Irene Adler is Holmes asked to resolve?",
+      "answer": "Holmes is hired to retrieve a compromising photograph that Irene Adler possesses.",
+      "relevant_doc_ids": ["the_adventures_of_sherlock_holmes"],
+      "metadata": {"difficulty": "hard", "type": "specific_detail"}
+    },
+    {
+      "id": "multihop_1",
+      "question": "What trait do both Mr. Darcy in Pride and Prejudice and Victor Frankenstein share that leads to their initial troubles?",
+      "answer": "Both characters exhibit excessive pride - Darcy's social pride causes misunderstandings with Elizabeth, while Victor's scientific pride leads him to create the monster without considering consequences.",
+      "relevant_doc_ids": ["pride_and_prejudice", "frankenstein"],
+      "metadata": {"difficulty": "hard", "type": "multi_hop"}
+    },
+    {
+      "id": "multihop_2",
+      "question": "How do the protagonists' journeys in Alice in Wonderland and Moby Dick both involve pursuing something that seems impossible?",
+      "answer": "Alice pursues the White Rabbit into an impossible underground world, while Ahab pursues the seemingly uncatchable white whale Moby Dick across the seas.",
+      "relevant_doc_ids": ["alices_adventures_in_wonderland", "moby_dick"],
+      "metadata": {"difficulty": "hard", "type": "multi_hop"}
+    },
+    {
+      "id": "multihop_3",
+      "question": "What narrative role does Watson serve for Holmes that is similar to Ishmael's role in Moby Dick?",
+      "answer": "Both Watson and Ishmael serve as first-person narrators who tell the story of a more remarkable central figure (Holmes and Ahab respectively).",
+      "relevant_doc_ids": ["the_adventures_of_sherlock_holmes", "moby_dick"],
+      "metadata": {"difficulty": "hard", "type": "multi_hop"}
+    },
+    {
+      "id": "multihop_4",
+      "question": "Compare how Elizabeth Bennet and Alice both challenge authority figures in their respective stories.",
+      "answer": "Elizabeth challenges Lady Catherine de Bourgh's social authority by refusing to promise not to marry Darcy. Alice challenges the Queen of Hearts' tyrannical authority and the absurd rules of Wonderland.",
+      "relevant_doc_ids": ["pride_and_prejudice", "alices_adventures_in_wonderland"],
+      "metadata": {"difficulty": "hard", "type": "multi_hop"}
+    },
+    {
+      "id": "multihop_5",
+      "question": "What tragic consequence befalls both Frankenstein's creation and Captain Ahab due to their respective obsessions?",
+      "answer": "Both meet destruction - the monster is consumed by hatred and guilt after Victor's death, while Ahab is killed by Moby Dick in his obsessive pursuit.",
+      "relevant_doc_ids": ["frankenstein", "moby_dick"],
+      "metadata": {"difficulty": "hard", "type": "multi_hop"}
+    },
+    {
+      "id": "distractor_1",
+      "question": "Which character named Elizabeth rejects a marriage proposal from a pompous man?",
+      "answer": "Elizabeth Bennet rejects the marriage proposal from Mr. Collins in Pride and Prejudice.",
+      "relevant_doc_ids": ["pride_and_prejudice"],
+      "metadata": {"difficulty": "hard", "type": "distractor", "note": "Elizabeth is also Victor's fiancee in Frankenstein"}
+    },
+    {
+      "id": "distractor_2",
+      "question": "In which story does a character fall from a great height into an unfamiliar world?",
+      "answer": "In Alice's Adventures in Wonderland, Alice falls down the rabbit hole into Wonderland.",
+      "relevant_doc_ids": ["alices_adventures_in_wonderland"],
+      "metadata": {"difficulty": "hard", "type": "distractor", "note": "Victor also 'falls' metaphorically into his dark work"}
+    },
+    {
+      "id": "distractor_3",
+      "question": "Which story features a pursuit across the ocean that ends in tragedy?",
+      "answer": "Moby Dick features Captain Ahab's pursuit of the white whale across the ocean, ending in the destruction of the Pequod and Ahab's death.",
+      "relevant_doc_ids": ["moby_dick"],
+      "metadata": {"difficulty": "hard", "type": "distractor", "note": "Frankenstein also has ocean pursuit when Victor chases monster to Arctic"}
+    },
+    {
+      "id": "distractor_4",
+      "question": "In which work does a character consult someone about a case involving a mysterious death?",
+      "answer": "In The Adventures of Sherlock Holmes, clients consult Holmes about various cases involving mysterious deaths.",
+      "relevant_doc_ids": ["the_adventures_of_sherlock_holmes"],
+      "metadata": {"difficulty": "hard", "type": "distractor", "note": "Victor also investigates his brother William's death in Frankenstein"}
+    },
+    {
+      "id": "distractor_5",
+      "question": "Which proud character must overcome his prejudices to find happiness?",
+      "answer": "Mr. Darcy must overcome his pride and class prejudices to marry Elizabeth Bennet.",
+      "relevant_doc_ids": ["pride_and_prejudice"],
+      "metadata": {"difficulty": "hard", "type": "distractor", "note": "Victor Frankenstein also exhibits pride"}
+    },
+    {
+      "id": "crosschunk_1",
+      "question": "Trace Elizabeth Bennet's changing opinion of Mr. Darcy from their first meeting to his second proposal.",
+      "answer": "Elizabeth initially finds Darcy proud and disagreeable at the Meryton ball. Her opinion worsens after Wickham's lies. After reading Darcy's letter explaining his actions and visiting Pemberley, she recognizes his true character. She accepts his second proposal having overcome her prejudice.",
+      "relevant_doc_ids": ["pride_and_prejudice"],
+      "metadata": {"difficulty": "hard", "type": "cross_chunk"}
+    },
+    {
+      "id": "crosschunk_2",
+      "question": "Describe the sequence of events from Victor Frankenstein creating the monster to his death.",
+      "answer": "Victor creates the monster at Ingolstadt and immediately abandons it in horror. The monster, rejected by society, kills William. Victor refuses to create a female companion. The monster kills Elizabeth. Victor pursues the monster to the Arctic where Victor dies and the monster vows to end his own life.",
+      "relevant_doc_ids": ["frankenstein"],
+      "metadata": {"difficulty": "hard", "type": "cross_chunk"}
+    },
+    {
+      "id": "crosschunk_3",
+      "question": "How does the crew's attitude toward Ahab's quest change throughout the voyage of the Pequod?",
+      "answer": "Initially the crew is swept up in Ahab's charisma and the promise of gold for spotting Moby Dick. As the voyage continues and they encounter the white whale, some like Starbuck grow wary of Ahab's monomania. Despite warnings and ill omens, Ahab drives them to the final fatal encounter.",
+      "relevant_doc_ids": ["moby_dick"],
+      "metadata": {"difficulty": "hard", "type": "cross_chunk"}
+    },
+    {
+      "id": "crosschunk_4",
+      "question": "List the major trials Alice faces before waking up from Wonderland.",
+      "answer": "Alice faces many trials: shrinking and growing from eating and drinking, nearly drowning in her tears, the confusing Caucus Race, the Mad Tea Party, the Duchess's chaotic kitchen, croquet with the Queen, the Mock Turtle's sad story, and finally the chaotic trial before waking.",
+      "relevant_doc_ids": ["alices_adventures_in_wonderland"],
+      "metadata": {"difficulty": "hard", "type": "cross_chunk"}
+    },
+    {
+      "id": "crosschunk_5",
+      "question": "What cases does Sherlock Holmes solve in the Adventures that involve disguises or hidden identities?",
+      "answer": "Several cases involve disguises: A Scandal in Bohemia (Holmes disguises himself, Irene Adler disguises herself), The Man with the Twisted Lip (Neville St. Clair disguises himself as a beggar), The Adventure of the Beryl Coronet, and A Case of Identity (the stepfather disguises himself as Hosmer Angel).",
+      "relevant_doc_ids": ["the_adventures_of_sherlock_holmes"],
+      "metadata": {"difficulty": "hard", "type": "cross_chunk"}
+    },
+    {
+      "id": "unanswerable_1",
+      "question": "What is the name of Sherlock Holmes's sister?",
+      "answer": "UNANSWERABLE - Sherlock Holmes has a brother Mycroft mentioned in the stories, but no sister is ever mentioned.",
+      "relevant_doc_ids": [],
+      "metadata": {"difficulty": "hard", "type": "unanswerable"}
+    },
+    {
+      "id": "unanswerable_2",
+      "question": "What university did Elizabeth Bennet attend?",
+      "answer": "UNANSWERABLE - Women did not attend university in Regency England. Elizabeth Bennet was educated at home like most women of her class.",
+      "relevant_doc_ids": [],
+      "metadata": {"difficulty": "hard", "type": "unanswerable"}
+    },
+    {
+      "id": "unanswerable_3",
+      "question": "What is the White Rabbit's real name in Alice in Wonderland?",
+      "answer": "UNANSWERABLE - The White Rabbit is never given a personal name in the story; he is only called the White Rabbit.",
+      "relevant_doc_ids": [],
+      "metadata": {"difficulty": "hard", "type": "unanswerable"}
+    },
+    {
+      "id": "unanswerable_4",
+      "question": "What was the name of the ship Captain Ahab commanded before the Pequod?",
+      "answer": "UNANSWERABLE - The novel does not mention any previous ships Ahab commanded before the Pequod.",
+      "relevant_doc_ids": [],
+      "metadata": {"difficulty": "hard", "type": "unanswerable"}
+    },
+    {
+      "id": "unanswerable_5",
+      "question": "What subject did Victor Frankenstein teach after creating the monster?",
+      "answer": "UNANSWERABLE - Victor Frankenstein never became a teacher. After creating the monster, he was consumed by guilt and spent his life dealing with its consequences.",
+      "relevant_doc_ids": [],
+      "metadata": {"difficulty": "hard", "type": "unanswerable"}
+    },
+    {
+      "id": "unanswerable_6",
+      "question": "How many children did Mr. and Mrs. Darcy have after their marriage?",
+      "answer": "UNANSWERABLE - Pride and Prejudice ends with their marriage; their future children are not mentioned in the novel.",
+      "relevant_doc_ids": [],
+      "metadata": {"difficulty": "hard", "type": "unanswerable"}
+    },
+    {
+      "id": "unanswerable_7",
+      "question": "What happened to the Cheshire Cat after Alice left Wonderland?",
+      "answer": "UNANSWERABLE - The story ends when Alice wakes up; the fate of Wonderland characters afterward is not described.",
+      "relevant_doc_ids": [],
+      "metadata": {"difficulty": "hard", "type": "unanswerable"}
+    },
+    {
+      "id": "unanswerable_8",
+      "question": "What was Dr. Watson's middle name?",
+      "answer": "UNANSWERABLE - Dr. Watson's middle name is not consistently given in the Holmes stories. He is referred to as John H. Watson, but the H is never explained.",
+      "relevant_doc_ids": [],
+      "metadata": {"difficulty": "hard", "type": "unanswerable"}
+    },
+    {
+      "id": "lexical_hard_1",
+      "question": "Describe the romantic complications that arise between the Bennet family and the Netherfield party.",
+      "answer": "Jane Bennet and Mr. Bingley develop mutual affection, but Bingley's sisters and Darcy initially discourage the match. Elizabeth and Darcy have a contentious relationship that slowly transforms to love. Lydia's elopement with Wickham creates scandal that Darcy secretly resolves.",
+      "relevant_doc_ids": ["pride_and_prejudice"],
+      "metadata": {"difficulty": "hard", "type": "low_lexical_overlap"}
+    },
+    {
+      "id": "lexical_hard_2",
+      "question": "What scientific hubris leads to catastrophe in Shelley's Gothic novel?",
+      "answer": "Victor Frankenstein's belief that he could create life without consequences leads to the creation of a creature he abandons. This hubris results in the deaths of his family and his own destruction.",
+      "relevant_doc_ids": ["frankenstein"],
+      "metadata": {"difficulty": "hard", "type": "low_lexical_overlap"}
+    },
+    {
+      "id": "lexical_hard_3",
+      "question": "How does the Nantucket whaling vessel meet its end?",
+      "answer": "The Pequod is destroyed by Moby Dick in the final confrontation. The white whale rams and sinks the ship, killing all crew except Ishmael who survives by clinging to Queequeg's coffin.",
+      "relevant_doc_ids": ["moby_dick"],
+      "metadata": {"difficulty": "hard", "type": "low_lexical_overlap"}
+    },
+    {
+      "id": "lexical_hard_4",
+      "question": "What absurdist judicial proceeding does the young protagonist witness before awakening?",
+      "answer": "Alice attends the trial of the Knave of Hearts, accused of stealing tarts. The proceedings are absurd with nonsensical evidence, a jury of animals, and the Queen's constant death threats.",
+      "relevant_doc_ids": ["alices_adventures_in_wonderland"],
+      "metadata": {"difficulty": "hard", "type": "low_lexical_overlap"}
+    },
+    {
+      "id": "lexical_hard_5",
+      "question": "What is the profession of the individual residing at the famous London address with the distinctive number?",
+      "answer": "Sherlock Holmes, a consulting detective, lives at 221B Baker Street in London.",
+      "relevant_doc_ids": ["the_adventures_of_sherlock_holmes"],
+      "metadata": {"difficulty": "hard", "type": "low_lexical_overlap"}
+    },
+    {
+      "id": "reasoning_1",
+      "question": "Why does Darcy initially refuse to dance with Elizabeth at the Meryton ball?",
+      "answer": "Darcy considers the assembly beneath his dignity and tells Bingley that Elizabeth is 'tolerable but not handsome enough to tempt me.' His pride makes him dismiss the local society.",
+      "relevant_doc_ids": ["pride_and_prejudice"],
+      "metadata": {"difficulty": "medium", "type": "reasoning"}
+    },
+    {
+      "id": "reasoning_2",
+      "question": "Why does the monster in Frankenstein demand that Victor create a female companion?",
+      "answer": "The monster is utterly alone and rejected by humanity. He believes a female creature would be his equal and provide the companionship and love he craves but can never receive from humans.",
+      "relevant_doc_ids": ["frankenstein"],
+      "metadata": {"difficulty": "medium", "type": "reasoning"}
+    },
+    {
+      "id": "reasoning_3",
+      "question": "Why is Starbuck unable to convince Ahab to abandon the hunt for Moby Dick?",
+      "answer": "Ahab's obsession with revenge against the whale that took his leg has become his sole purpose for living. His monomania overrides all rational arguments about safety, profit, or the crew's welfare.",
+      "relevant_doc_ids": ["moby_dick"],
+      "metadata": {"difficulty": "medium", "type": "reasoning"}
+    },
+    {
+      "id": "reasoning_4",
+      "question": "Why does Alice keep changing size throughout her journey in Wonderland?",
+      "answer": "Alice's size changes result from eating and drinking various items in Wonderland. These changes represent her struggles to adapt to an illogical world and mirror the confusion of growing up.",
+      "relevant_doc_ids": ["alices_adventures_in_wonderland"],
+      "metadata": {"difficulty": "medium", "type": "reasoning"}
+    },
+    {
+      "id": "reasoning_5",
+      "question": "Why does Holmes often withhold his deductions from Watson until the end of a case?",
+      "answer": "Holmes enjoys the dramatic reveal and demonstrating his superior reasoning. He also tests his theories before explaining them, and Watson's amazement provides validation of Holmes's genius.",
+      "relevant_doc_ids": ["the_adventures_of_sherlock_holmes"],
+      "metadata": {"difficulty": "medium", "type": "reasoning"}
+    },
+    {
+      "id": "char_1",
+      "question": "Describe Mr. Wickham's true character as revealed in Pride and Prejudice.",
+      "answer": "Wickham appears charming and gentlemanly but is actually dishonest and mercenary. He lied about Darcy, attempted to elope with Georgiana Darcy for her fortune, and later elopes with Lydia Bennet irresponsibly.",
+      "relevant_doc_ids": ["pride_and_prejudice"],
+      "metadata": {"difficulty": "medium", "type": "character_analysis"}
+    },
+    {
+      "id": "char_2",
+      "question": "How does the creature's character evolve after being abandoned by Frankenstein?",
+      "answer": "Initially innocent and seeking connection, the creature becomes bitter and vengeful after repeated rejection by humans. He educates himself and develops eloquence, but his isolation turns his loneliness into murderous rage.",
+      "relevant_doc_ids": ["frankenstein"],
+      "metadata": {"difficulty": "hard", "type": "character_analysis"}
+    },
+    {
+      "id": "char_3",
+      "question": "What does Queequeg's character reveal about the novel's treatment of race and civilization?",
+      "answer": "Queequeg, a Pacific Islander and skilled harpooner, is portrayed as noble, loyal, and moral despite being a 'savage' cannibal. His friendship with Ishmael challenges 19th century racial prejudices and the presumed superiority of Western civilization.",
+      "relevant_doc_ids": ["moby_dick"],
+      "metadata": {"difficulty": "hard", "type": "character_analysis"}
+    },
+    {
+      "id": "theme_1",
+      "question": "What social commentary does Pride and Prejudice make about marriage in Regency England?",
+      "answer": "The novel critiques marriages of convenience while celebrating unions based on mutual respect and love. Through various marriages (Charlotte-Collins for security, Lydia-Wickham from foolishness, Elizabeth-Darcy for love), Austen examines how class, money, and affection interact.",
+      "relevant_doc_ids": ["pride_and_prejudice"],
+      "metadata": {"difficulty": "hard", "type": "theme"}
+    },
+    {
+      "id": "theme_2",
+      "question": "What warning about scientific responsibility does Frankenstein convey?",
+      "answer": "The novel warns against pursuing knowledge without considering ethical consequences. Victor creates life but takes no responsibility for his creation, showing that scientific achievement without moral guidance leads to destruction.",
+      "relevant_doc_ids": ["frankenstein"],
+      "metadata": {"difficulty": "hard", "type": "theme"}
+    },
+    {
+      "id": "quote_1",
+      "question": "Complete this quote from Pride and Prejudice: 'It is a truth universally acknowledged...'",
+      "answer": "...that a single man in possession of a good fortune, must be in want of a wife.",
+      "relevant_doc_ids": ["pride_and_prejudice"],
+      "metadata": {"difficulty": "easy", "type": "quote_completion"}
+    },
+    {
+      "id": "quote_2",
+      "question": "What does the Caterpillar repeatedly ask Alice when they first meet?",
+      "answer": "The Caterpillar repeatedly asks 'Who are you?' which Alice struggles to answer after her many transformations.",
+      "relevant_doc_ids": ["alices_adventures_in_wonderland"],
+      "metadata": {"difficulty": "medium", "type": "quote_completion"}
+    },
+    {
+      "id": "quote_3",
+      "question": "What phrase does the Queen of Hearts constantly shout?",
+      "answer": "The Queen of Hearts constantly shouts 'Off with their head!' or 'Off with his/her head!' at the slightest provocation.",
+      "relevant_doc_ids": ["alices_adventures_in_wonderland"],
+      "metadata": {"difficulty": "easy", "type": "quote_completion"}
+    },
+    {
+      "id": "setting_1",
+      "question": "Where does the climactic final chase between Victor and the monster take place?",
+      "answer": "The final chase takes place in the Arctic, with Victor pursuing the monster across the frozen seas. Victor dies aboard Walton's ship, and the monster appears to mourn him.",
+      "relevant_doc_ids": ["frankenstein"],
+      "metadata": {"difficulty": "medium", "type": "setting"}
+    },
+    {
+      "id": "setting_2",
+      "question": "What is significant about Pemberley in Pride and Prejudice?",
+      "answer": "Pemberley is Darcy's grand estate in Derbyshire. When Elizabeth visits, she sees evidence of Darcy's good character from the housekeeper and begins to reconsider her opinion of him.",
+      "relevant_doc_ids": ["pride_and_prejudice"],
+      "metadata": {"difficulty": "medium", "type": "setting"}
+    },
+    {
+      "id": "minor_char_1",
+      "question": "Who is Mrs. Bennet and what is her primary concern throughout Pride and Prejudice?",
+      "answer": "Mrs. Bennet is the mother of the five Bennet daughters. Her primary concern is finding wealthy husbands for her daughters, as the Longbourn estate is entailed away from the female line.",
+      "relevant_doc_ids": ["pride_and_prejudice"],
+      "metadata": {"difficulty": "medium", "type": "minor_character"}
+    },
+    {
+      "id": "minor_char_2",
+      "question": "Who is Pip in Moby Dick and what happens to him?",
+      "answer": "Pip is a young Black cabin boy who falls overboard during a whale chase and is left floating in the ocean until rescued. The experience drives him mad, but Ahab shows him unusual kindness.",
+      "relevant_doc_ids": ["moby_dick"],
+      "metadata": {"difficulty": "hard", "type": "minor_character"}
+    },
+    {
+      "id": "plot_detail_1",
+      "question": "How does Elizabeth learn the truth about Wickham's character?",
+      "answer": "Elizabeth learns the truth from Darcy's letter, which explains that Wickham squandered his inheritance and attempted to elope with Darcy's young sister Georgiana for her fortune.",
+      "relevant_doc_ids": ["pride_and_prejudice"],
+      "metadata": {"difficulty": "medium", "type": "plot_detail"}
+    },
+    {
+      "id": "plot_detail_2",
+      "question": "What happens in 'The Red-Headed League' story?",
+      "answer": "A red-headed pawnbroker is lured away from his shop by a fake league paying him to copy the encyclopedia. Holmes deduces this is a scheme to tunnel from the shop into a nearby bank vault.",
+      "relevant_doc_ids": ["the_adventures_of_sherlock_holmes"],
+      "metadata": {"difficulty": "hard", "type": "plot_detail"}
+    },
+    {
+      "id": "plot_detail_3",
+      "question": "Why does the monster kill Elizabeth on her wedding night?",
+      "answer": "The monster kills Elizabeth to revenge Victor's destruction of the female companion Victor was creating. The monster had warned 'I will be with you on your wedding night.'",
+      "relevant_doc_ids": ["frankenstein"],
+      "metadata": {"difficulty": "hard", "type": "plot_detail"}
+    },
+    {
+      "id": "comparative_1",
+      "question": "How do both Pride and Prejudice and Frankenstein explore the theme of judgment based on appearance?",
+      "answer": "In Pride and Prejudice, Elizabeth misjudges Darcy as proud and Wickham as good based on first impressions. In Frankenstein, the creature is rejected by all due to his hideous appearance despite his initially gentle nature.",
+      "relevant_doc_ids": ["pride_and_prejudice", "frankenstein"],
+      "metadata": {"difficulty": "hard", "type": "comparative"}
+    },
+    {
+      "id": "inference_1",
+      "question": "What can we infer about Victorian attitudes toward science from Frankenstein?",
+      "answer": "The novel reflects anxiety about scientific progress outpacing moral understanding. Victor's tragedy suggests that the Romantic era feared science could overreach natural bounds with catastrophic consequences.",
+      "relevant_doc_ids": ["frankenstein"],
+      "metadata": {"difficulty": "hard", "type": "inference"}
+    },
+    {
+      "id": "inference_2",
+      "question": "What does the absurdity of Wonderland suggest about childhood and growing up?",
+      "answer": "Wonderland's arbitrary rules and constant transformations mirror children's experience of adult society as confusing and inconsistent. Alice's struggles to fit in reflect the challenges of maturation.",
+      "relevant_doc_ids": ["alices_adventures_in_wonderland"],
+      "metadata": {"difficulty": "hard", "type": "inference"}
+    },
+    {
+      "id": "sequence_1",
+      "question": "In what order do the following events occur in Pride and Prejudice: Lydia's elopement, Darcy's first proposal, Elizabeth's visit to Pemberley?",
+      "answer": "The sequence is: 1) Darcy's first proposal (rejected at Hunsford), 2) Elizabeth's visit to Pemberley, 3) Lydia's elopement with Wickham.",
+      "relevant_doc_ids": ["pride_and_prejudice"],
+      "metadata": {"difficulty": "hard", "type": "sequence"}
+    },
+    {
+      "id": "author_intent_1",
+      "question": "What narrative purpose does Ishmael's survival serve in Moby Dick?",
+      "answer": "Ishmael's survival allows him to tell the story - he is the sole witness to the Pequod's fate. His philosophical nature provides commentary on the events, and his survival by Queequeg's coffin symbolizes friendship transcending death.",
+      "relevant_doc_ids": ["moby_dick"],
+      "metadata": {"difficulty": "hard", "type": "author_intent"}
+    }
+  ]
+}
