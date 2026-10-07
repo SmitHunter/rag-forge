@@ -17,7 +17,11 @@
 Measures how chunking, BM25 vs dense vs hybrid retrieval, and cross-encoder reranking change Recall@1 and MRR on a 76-question set over 5 public-domain novels. Best first stage: **Hybrid (BM25=0.3)**, 0.868 Recall@1 and 0.940 MRR at 8 ms. Reranking raises MRR to 0.946 at 285–315 ms.
 
 <p align="center">
-  <img alt="Grouped bar chart of Recall@1, Recall@5, and MRR for six retrieval configs, with average query latency on a second axis" src="docs/offline_retrieval_metrics.png" width="800">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/retrieval-dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="docs/retrieval-light.png">
+    <img alt="Dot plot of Recall@1, Recall@5 and MRR for six retrieval configs, with average latency bars on a log scale; Hybrid (BM25=0.3) highlighted as the best first stage" src="docs/retrieval-light.png" width="800">
+  </picture>
 </p>
 
 <p align="center"><sub>Offline retrieval eval · 76 questions · MiniLM embeddings · 4-core CPU, no GPU · data: <a href="results/offline_eval.json"><code>results/offline_eval.json</code></a></sub></p>
@@ -173,7 +177,7 @@ Retrieval scores on this VM matched the previously published table. Rerank laten
 
 ```bash
 python scripts/run_eval.py --offline --output eval_results.json
-python scripts/plot_eval_results.py --input eval_results.json --output docs/offline_retrieval_metrics.png
+python scripts/plot_eval_results.py --input results/offline_eval.json --theme both --outdir docs
 ```
 
 Requires `pip install -e ".[viz]"` (matplotlib) for the plot script.
@@ -316,7 +320,9 @@ rag-forge/
 │   ├── run_eval.py           # Run evaluation harness
 │   └── plot_eval_results.py  # Chart from eval JSON
 ├── docs/
-│   ├── offline_retrieval_metrics.png
+│   ├── brand/                # Light/dark README banners
+│   ├── retrieval-light.png
+│   ├── retrieval-dark.png
 │   └── ui-offline-query.png  # Offline web UI screenshot
 ├── data/
 │   └── qa_dataset.json   # 76-question evaluation set
