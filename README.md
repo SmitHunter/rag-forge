@@ -160,14 +160,16 @@ rag-forge serve --port 8000
 
 Results from running the evaluation harness on the classic literature corpus (5 documents, 1,603 chunks after front-matter stripping, 76 QA pairs including paraphrased, multi-hop, cross-chunk, and unanswerable questions). Embeddings: SentenceTransformers `all-MiniLM-L6-v2`. Answer generation: offline template mode (retrieval-only baseline).
 
+Raw output from `python scripts/run_eval.py --offline` on a 4-core Intel Xeon (no GPU): [`results/offline_eval.json`](results/offline_eval.json). Retrieval scores in that file match this table (rounded to 3 decimals). Latency is this machine's: Hybrid (BM25=0.5) 9ms; Dense + Rerank 315ms; Hybrid + Rerank 285ms.
+
 | Configuration | Recall@1 | Recall@5 | MRR | Faithfulness | Latency |
 |---------------|----------|----------|-----|--------------|---------|
 | BM25 Only | 0.728 | 0.926 | 0.837 | 0.807 | 3ms |
 | Dense Only | 0.853 | 0.963 | 0.933 | 0.802 | 5ms |
 | Hybrid (BM25=0.3) | **0.868** | 0.963 | 0.940 | 0.799 | 8ms |
-| Hybrid (BM25=0.5) | 0.838 | **0.971** | 0.917 | 0.806 | 8ms |
-| Dense + Rerank | **0.868** | 0.956 | **0.946** | **0.817** | 262ms |
-| Hybrid + Rerank | **0.868** | 0.956 | **0.946** | 0.810 | 252ms |
+| Hybrid (BM25=0.5) | 0.838 | **0.971** | 0.917 | 0.806 | 9ms |
+| Dense + Rerank | **0.868** | 0.956 | **0.946** | **0.817** | 315ms |
+| Hybrid + Rerank | **0.868** | 0.956 | **0.946** | 0.810 | 285ms |
 
 ### Metrics Explained
 
@@ -184,7 +186,7 @@ Results from running the evaluation harness on the classic literature corpus (5 
 
 **Coverage and precision still trade off.** Hybrid (BM25=0.5) has the best Recall@5 (0.971) but a weaker Recall@1 (0.838). If users see only the top hit, prefer Hybrid 0.3 (or dense + rerank). If they can scan a short list, Hybrid 0.5 covers more gold documents.
 
-**Reranking now helps a little, at a cost.** Dense + rerank and Hybrid + rerank match the best Recall@1 (0.868) and take the best MRR (0.946), with faithfulness 0.817 / 0.810. They add ~250ms. On the previous (front-matter-included) ingest, rerank did not help — another reminder to re-measure after corpus cleanup.
+**Reranking now helps a little, at a cost.** Dense + rerank and Hybrid + rerank match the best Recall@1 (0.868) and take the best MRR (0.946), with faithfulness 0.817 / 0.810. They add 285–315ms on this CPU. On the previous (front-matter-included) ingest, rerank did not help — another reminder to re-measure after corpus cleanup.
 
 **Faithfulness is stable across configurations (~0.80) in the offline table.** That is mechanical: the template extracts sentences from context, so n-gram overlap is high. It is not evidence of fluent generation.
 
@@ -202,6 +204,8 @@ RAG_FORGE_LLM_MAX_TOKENS=256 python scripts/run_eval.py \
 |---------------|----------|----------|-----|--------------|-------------|------------|---------|
 | Dense Only | 0.853 | 0.963 | 0.933 | 0.151 | 0.168 | 0.875 | 15187ms |
 | Hybrid (BM25=0.3) | 0.868 | 0.963 | 0.940 | 0.187 | 0.163 | 0.625 | 13382ms |
+
+No raw JSON for this table is in the repo. This VM does not have Ollama, so the `llama3.2:1b` run was not repeated.
 
 Retrieval scores match the offline table (same retriever, same ingest). Generation changes the answer metrics:
 
@@ -254,7 +258,7 @@ export RAG_FORGE_USE_RERANKING=true
 | `ollama_host` | URL | `http://localhost:11434` |
 | `chunking_strategy` | `fixed_size`, `sentence`, `paragraph`, `semantic` | `fixed_size` |
 | `retrieval_strategy` | `bm25`, `dense`, `hybrid` | `hybrid` (BM25 weight 0.3 — best first-stage) |
-| `use_reranking` | `true`, `false` | `false` (on here, rerank ties R@1 and wins MRR at ~250ms) |
+| `use_reranking` | `true`, `false` | `false` (on here, rerank ties R@1 and wins MRR at 285–315ms) |
 | `chunk_size` | int (tokens) | `512` |
 | `retrieval_top_k` | int | `5` |
 
@@ -289,6 +293,8 @@ rag-forge/
 │   └── run_eval.py       # Run evaluation harness
 ├── data/
 │   └── qa_dataset.json   # 76-question evaluation set
+├── results/
+│   └── offline_eval.json # Raw `run_eval.py --offline` output
 ├── tests/                # pytest suite (mocked providers; no model download)
 └── .github/workflows/    # CI: ruff lint + format, mypy, pytest (3.10–3.12)
 ```
@@ -312,7 +318,7 @@ rag-forge/
 | Dense | Strong precision (0.853 R@1) | Embedding cost | Conceptual queries |
 | Hybrid 0.3 | Best first-stage R@1 (0.868) and MRR (0.940) | More complexity | Default / production |
 | Hybrid 0.5 | Best R@5 (0.971) | Weaker R@1 (0.838) | Users who scan a short list |
-| +Rerank | Ties best R@1 (0.868), best MRR (0.946) | ~250ms extra | When extra ranking quality is worth the latency |
+| +Rerank | Ties best R@1 (0.868), best MRR (0.946) | 285–315ms extra | When extra ranking quality is worth the latency |
 
 ### When to Use Each
 
@@ -320,7 +326,7 @@ rag-forge/
 - **Dense**: When users ask conceptual questions in natural language
 - **Hybrid 0.3**: Default first-stage — best R@1 (0.868) and first-stage MRR (0.940)
 - **Hybrid 0.5**: When users can scan top-5 (best R@5 0.971)
-- **Reranking**: Add on top of dense or hybrid when you want the extra MRR (0.946 vs 0.940) and can spend ~250ms
+- **Reranking**: Add on top of dense or hybrid when you want the extra MRR (0.946 vs 0.940) and can spend 285–315ms
 
 ## Running Tests
 
@@ -351,7 +357,7 @@ from rag_forge import RAGPipeline, Settings
 # Configure
 settings = Settings(
     retrieval_strategy="hybrid",  # BM25 weight 0.3 — best first-stage
-    # use_reranking=True,         # optional: best MRR (0.946), ~250ms extra
+    # use_reranking=True,         # optional: best MRR (0.946), 285–315ms extra
 )
 
 # Initialize pipeline
@@ -391,7 +397,7 @@ Honest constraints a reviewer should know before treating this as a production s
 - **Generated-answer scores are from `llama3.2:1b` on CPU**, not from CI. GitHub Actions does not install Ollama; local-provider tests mock HTTP. Larger models would change correctness and latency.
 - **Faithfulness is n-gram overlap**, not an NLI/LLM-as-judge score. Correctness (token F1 vs gold) is computed internally but omitted from the public table because the template is not a real generator.
 - **Corpus is tiny and literary.** Five public-domain novels. Hybrid 0.3 winning first-stage here does not imply it wins on technical docs, logs, or code.
-- **Reranker result is dataset-specific.** After front-matter stripping, rerank ties best R@1 (0.868) and wins MRR (0.946 vs 0.940 first-stage) at 252–262ms. On the previous dirty ingest it did not help. Measure again if the corpus changes.
+- **Reranker result is dataset-specific.** After front-matter stripping, rerank ties best R@1 (0.868) and wins MRR (0.946 vs 0.940 first-stage) at 285–315ms on this 4-core Xeon. On the previous dirty ingest it did not help. Measure again if the corpus changes.
 - **Demo server is not production-hardened.** FastAPI binds to localhost, uses a process-global pipeline, and has no auth. Citation HTML is escaped; treat it as a local demo.
 - **API keys stay in the environment.** Nothing is committed. `.env` is gitignored. Do not put secrets in CLI history on a shared machine.
 - **Chunking default is fixed-size 512 tokens.** Semantic chunking exists but is slower and not in the published eval.
