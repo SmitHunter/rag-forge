@@ -1,14 +1,26 @@
-# RAG Forge
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/brand/banner-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="docs/brand/banner-light.svg">
+    <img alt="RAG Forge: measured retrieval experiments with BM25, dense, hybrid and reranking" src="docs/brand/banner-light.svg" width="100%">
+  </picture>
+</p>
 
-[![CI](https://img.shields.io/github/actions/workflow/status/SmitHunter/rag-forge/ci.yml?branch=main&label=CI&style=flat)](https://github.com/SmitHunter/rag-forge/actions/workflows/ci.yml)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue?style=flat)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat)](LICENSE)
+<p align="center">
+  <a href="https://github.com/SmitHunter/rag-forge/actions/workflows/ci.yml"><img alt="CI status" src="https://img.shields.io/github/actions/workflow/status/SmitHunter/rag-forge/ci.yml?branch=main&label=CI&style=flat"></a>
+  <a href="pyproject.toml"><img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-3776AB?style=flat"></a>
+  <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-yellow?style=flat"></a>
+</p>
 
-![Grouped bar chart of Recall@1, Recall@5, and MRR for six retrieval configs, with average query latency on a second axis](docs/offline_retrieval_metrics.png)
+<p align="center"><a href="#results">Results</a> · <a href="#quickstart">Quickstart</a> · <a href="#how-it-works">How it works</a> · <a href="#limitations">Limitations</a></p>
 
-Measures how chunking, BM25 vs dense vs hybrid retrieval, and cross-encoder reranking change Recall@1 and MRR on a 76-question set over 5 public-domain novels.
+Measures how chunking, BM25 vs dense vs hybrid retrieval, and cross-encoder reranking change Recall@1 and MRR on a 76-question set over 5 public-domain novels. Best first stage: **Hybrid (BM25=0.3)**, 0.868 Recall@1 and 0.940 MRR at 8 ms. Reranking raises MRR to 0.946 at 285–315 ms.
 
-Best first stage: **Hybrid (BM25=0.3)** — 0.868 Recall@1, 0.940 MRR, 8ms. A cross-encoder reranker keeps Recall@1 at 0.868 and raises MRR to 0.946 (+0.006), at 285–315ms on this CPU.
+<p align="center">
+  <img alt="Grouped bar chart of Recall@1, Recall@5, and MRR for six retrieval configs, with average query latency on a second axis" src="docs/offline_retrieval_metrics.png" width="800">
+</p>
+
+<p align="center"><sub>Offline retrieval eval · 76 questions · MiniLM embeddings · 4-core CPU, no GPU · data: <a href="results/offline_eval.json"><code>results/offline_eval.json</code></a></sub></p>
 
 | Setup | Recall@1 | MRR | Latency |
 |-------|----------|-----|---------|
@@ -16,13 +28,11 @@ Best first stage: **Hybrid (BM25=0.3)** — 0.868 Recall@1, 0.940 MRR, 8ms. A cr
 | Dense or Hybrid + rerank | 0.868 | 0.946 | 285–315ms |
 | BM25 only | 0.728 | 0.837 | 3ms |
 
-Offline retrieval-only eval (`scripts/run_eval.py --offline`) on a 4-core Intel Xeon, no GPU. Embeddings: SentenceTransformers `all-MiniLM-L6-v2`. Chart: `scripts/plot_eval_results.py`. Full table and interpretation are in [Evaluation Results](#evaluation-results).
-
 ## The Problem
 
 LLMs hallucinate and go stale. RAG grounds answers in retrieved documents, but the retrieval choices matter: how you chunk, whether you use BM25, dense embeddings, or hybrid fusion, and whether a reranker is worth the latency. This repo implements those pieces as a configurable pipeline and measures them.
 
-## Architecture
+## How it works
 
 ```mermaid
 flowchart TB
@@ -155,7 +165,7 @@ Open http://localhost:8000. Screenshot: a real local run of the dataset question
 
 ![Offline web UI answering "What is the famous opening line of Pride and Prejudice?" with the gold opening sentence cited from the novel](docs/ui-offline-query.png)
 
-## Evaluation Results
+## Results
 
 Results from running the evaluation harness on the classic literature corpus (5 documents, 1,603 chunks after front-matter stripping, 76 QA pairs including paraphrased, multi-hop, cross-chunk, and unanswerable questions). Embeddings: SentenceTransformers `all-MiniLM-L6-v2`. Answer generation: offline template mode (retrieval-only baseline). Hardware: 4-core Intel Xeon, no discrete GPU. The hero chart is plotted from this table.
 
