@@ -173,6 +173,8 @@ python scripts/plot_eval_results.py --input eval_results.json --output docs/offl
 
 Requires `pip install -e ".[viz]"` (matplotlib) for the plot script.
 
+Raw output from `python scripts/run_eval.py --offline` on a 4-core Intel Xeon (no GPU): [`results/offline_eval.json`](results/offline_eval.json). Retrieval scores in that file match this table (rounded to 3 decimals). Latency is this machine's: Hybrid (BM25=0.5) 9ms; Dense + Rerank 315ms; Hybrid + Rerank 285ms.
+
 | Configuration | Recall@1 | Recall@5 | MRR | Faithfulness | Latency |
 |---------------|----------|----------|-----|--------------|---------|
 | BM25 Only | 0.728 | 0.926 | 0.837 | 0.807 | 3ms |
@@ -215,6 +217,8 @@ RAG_FORGE_LLM_MAX_TOKENS=256 python scripts/run_eval.py \
 |---------------|----------|----------|-----|--------------|-------------|------------|---------|
 | Dense Only | 0.853 | 0.963 | 0.933 | 0.151 | 0.168 | 0.875 | 15187ms |
 | Hybrid (BM25=0.3) | 0.868 | 0.963 | 0.940 | 0.187 | 0.163 | 0.625 | 13382ms |
+
+No raw JSON for this table is in the repo. This VM does not have Ollama, so the `llama3.2:1b` run was not repeated.
 
 Retrieval scores match the offline table (same retriever, same ingest). Generation changes the answer metrics:
 
@@ -305,6 +309,8 @@ rag-forge/
 │   └── offline_retrieval_metrics.png
 ├── data/
 │   └── qa_dataset.json   # 76-question evaluation set
+├── results/
+│   └── offline_eval.json # Raw `run_eval.py --offline` output
 ├── tests/                # pytest suite (mocked providers; no model download)
 └── .github/workflows/    # CI: ruff lint + format, mypy, pytest (3.10–3.12)
 ```
