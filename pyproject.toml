@@ -1,7 +1,7 @@
 [project]
 name = "rag-forge"
 version = "0.1.0"
-description = "Production-grade RAG document QA system with rigorous evaluation harness"
+description = "Offline RAG eval forge: BM25, dense, hybrid, rerank with measured baselines"
 readme = "README.md"
 license = { text = "MIT" }
 authors = [{ name = "Hunter Smith" }]

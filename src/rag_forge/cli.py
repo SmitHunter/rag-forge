@@ -25,7 +25,7 @@ from rag_forge.providers.local_llm_provider import OllamaNotAvailableError, chec
 
 app = typer.Typer(
     name="rag-forge",
-    help="Production-grade RAG document QA with evaluation harness.",
+    help="RAG document QA with a retrieval evaluation harness.",
     add_completion=False,
 )
 console = Console()

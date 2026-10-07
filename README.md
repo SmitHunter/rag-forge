@@ -6,20 +6,21 @@
 
 ![Grouped bar chart of Recall@1, Recall@5, and MRR for six retrieval configs, with average query latency on a second axis](docs/offline_retrieval_metrics.png)
 
-Offline retrieval-only eval (`scripts/run_eval.py --offline`) on a 4-core Intel Xeon, no GPU. Chart: `scripts/plot_eval_results.py`.
+Measures how chunking, BM25 vs dense vs hybrid retrieval, and cross-encoder reranking change Recall@1 and MRR on a 76-question set over 5 public-domain novels.
 
-A production-grade **Retrieval-Augmented Generation (RAG)** document question-answering system with a rigorous evaluation harness. Built to demonstrate real AI engineering depth with clean architecture, comprehensive testing, and quantitative evaluation.
+Best first stage: **Hybrid (BM25=0.3)** — 0.868 Recall@1, 0.940 MRR, 8ms. A cross-encoder reranker keeps Recall@1 at 0.868 and raises MRR to 0.946 (+0.006), at 285–315ms on this CPU.
+
+| Setup | Recall@1 | MRR | Latency |
+|-------|----------|-----|---------|
+| Hybrid (BM25=0.3), first stage | 0.868 | 0.940 | 8ms |
+| Dense or Hybrid + rerank | 0.868 | 0.946 | 285–315ms |
+| BM25 only | 0.728 | 0.837 | 3ms |
+
+Offline retrieval-only eval (`scripts/run_eval.py --offline`) on a 4-core Intel Xeon, no GPU. Embeddings: SentenceTransformers `all-MiniLM-L6-v2`. Chart: `scripts/plot_eval_results.py`. Full table and interpretation are in [Evaluation Results](#evaluation-results).
 
 ## The Problem
 
-Large Language Models are powerful but suffer from hallucination and knowledge cutoffs. RAG addresses this by grounding responses in retrieved documents, but building an effective RAG system involves many design decisions:
-
-- **Chunking strategy**: How to split documents while preserving semantic coherence
-- **Retrieval method**: Sparse (BM25), dense (embeddings), or hybrid approaches
-- **Reranking**: Whether to add a cross-encoder for better precision
-- **Provider flexibility**: Support for different LLMs and embedding models
-
-This project implements a complete RAG pipeline with **configurable components** and an **evaluation harness** to measure the impact of these choices quantitatively.
+LLMs hallucinate and go stale. RAG grounds answers in retrieved documents, but the retrieval choices matter: how you chunk, whether you use BM25, dense embeddings, or hybrid fusion, and whether a reranker is worth the latency. This repo implements those pieces as a configurable pipeline and measures them.
 
 ## Architecture
 
@@ -57,16 +58,6 @@ flowchart TB
         EVAL --> |Faithfulness, Abstention| AM[Answer Metrics]
     end
 ```
-
-### Key Components
-
-| Component | Description |
-|-----------|-------------|
-| **Chunking** | Fixed-size, sentence-based, paragraph-based, or semantic chunking strategies |
-| **Retrieval** | BM25 sparse retrieval, dense embedding retrieval (FAISS), or hybrid with RRF fusion |
-| **Reranking** | Optional cross-encoder reranking for improved precision |
-| **Providers** | Pluggable LLM (OpenAI, Anthropic, local, offline) and embedding (OpenAI, SentenceTransformers, offline) providers |
-| **Evaluation** | Comprehensive harness measuring retrieval (Recall@k, MRR) and answer quality (faithfulness, abstention) |
 
 ## Quickstart
 
@@ -280,27 +271,32 @@ export RAG_FORGE_USE_RERANKING=true
 ```
 rag-forge/
 ├── src/rag_forge/
-│   ├── chunking/         # Document chunking strategies
+│   ├── config.py         # Settings and enums
+│   ├── gutenberg.py      # Gutenberg front-matter stripping
+│   ├── chunking/
 │   │   └── strategies.py # Fixed, sentence, paragraph, semantic chunkers
-│   ├── retrieval/        # Retrieval components
+│   ├── retrieval/
+│   │   ├── base.py
 │   │   ├── bm25.py       # BM25 sparse retrieval
 │   │   ├── dense.py      # FAISS dense retrieval
 │   │   ├── hybrid.py     # RRF fusion hybrid retrieval
 │   │   └── reranker.py   # Cross-encoder reranking
-│   ├── providers/        # LLM and embedding providers
+│   ├── providers/
+│   │   ├── base.py
+│   │   ├── factory.py
 │   │   ├── openai_provider.py
 │   │   ├── anthropic_provider.py
 │   │   ├── sentence_transformers_provider.py
 │   │   ├── local_llm_provider.py
 │   │   └── offline_provider.py
-│   ├── pipeline/         # End-to-end RAG pipeline
-│   │   └── rag.py        # Main pipeline with citation support
-│   ├── eval/             # Evaluation harness
+│   ├── pipeline/
+│   │   └── rag.py        # Pipeline with citations
+│   ├── eval/
 │   │   ├── metrics.py    # Recall, MRR, faithfulness, abstention
 │   │   ├── harness.py    # Multi-config evaluation runner
-│   │   └── datasets.py   # QA dataset handling
-│   ├── cli.py            # Typer CLI
-│   └── api.py            # FastAPI web interface
+│   │   └── datasets.py
+│   ├── cli.py
+│   └── api.py            # FastAPI web UI
 ├── scripts/
 │   ├── download_data.py      # Download Project Gutenberg books
 │   ├── run_eval.py           # Run evaluation harness
@@ -311,8 +307,8 @@ rag-forge/
 │   └── qa_dataset.json   # 76-question evaluation set
 ├── results/
 │   └── offline_eval.json # Raw `run_eval.py --offline` output
-├── tests/                # pytest suite (mocked providers; no model download)
-└── .github/workflows/    # CI: ruff lint + format, mypy, pytest (3.10–3.12)
+├── tests/                # pytest; mocked providers; no model download
+└── .github/workflows/    # ruff, mypy, pytest (3.10–3.12)
 ```
 
 ## Design Trade-offs
@@ -332,17 +328,9 @@ rag-forge/
 |----------|------|------|----------|
 | BM25 | Fast (3ms), keyword-exact | No semantic understanding | Exact term matching |
 | Dense | Strong precision (0.853 R@1) | Embedding cost | Conceptual queries |
-| Hybrid 0.3 | Best first-stage R@1 (0.868) and MRR (0.940) | More complexity | Default / production |
+| Hybrid 0.3 | Best first-stage R@1 (0.868) and MRR (0.940) | More complexity | Default first-stage |
 | Hybrid 0.5 | Best R@5 (0.971) | Weaker R@1 (0.838) | Users who scan a short list |
 | +Rerank | Ties best R@1 (0.868), best MRR (0.946) | 285–315ms extra | When extra ranking quality is worth the latency |
-
-### When to Use Each
-
-- **BM25**: When queries use domain-specific terminology that must match exactly
-- **Dense**: When users ask conceptual questions in natural language
-- **Hybrid 0.3**: Default first-stage — best R@1 (0.868) and first-stage MRR (0.940)
-- **Hybrid 0.5**: When users can scan top-5 (best R@5 0.971)
-- **Reranking**: Add on top of dense or hybrid when you want the extra MRR (0.946 vs 0.940) and can spend 285–315ms
 
 ## Running Tests
 
@@ -402,7 +390,7 @@ curl http://localhost:8000/health
 # Query documents
 curl -X POST http://localhost:8000/query \
   -H "Content-Type: application/json" \
-  -d '{"question": "What is Python?", "top_k": 5}'
+  -d '{"question": "What is the opening line of Pride and Prejudice?", "top_k": 5}'
 ```
 
 ## Limitations
@@ -421,16 +409,9 @@ Honest constraints a reviewer should know before treating this as a production s
 
 ## Next Steps
 
-Potential improvements for future work:
-
-1. **Multi-vector retrieval**: ColBERT-style late interaction for better semantic matching
-2. **Query expansion**: HyDE or similar techniques for improved retrieval
-3. **Streaming responses**: Server-sent events for real-time answer generation
-4. **Advanced chunking**: Sliding window with hierarchical merging
-5. **Richer evaluation**: RAGAS metrics, human evaluation interface
-6. **Deployment**: Docker container, Kubernetes manifests
-7. **Caching**: Redis/Memcached for embedding and retrieval caching
-8. **Observability**: OpenTelemetry tracing, Prometheus metrics
+1. **Richer evaluation**: RAGAS or LLM-as-judge faithfulness, instead of n-gram overlap
+2. **Query expansion / multi-vector retrieval**: HyDE or ColBERT-style late interaction
+3. **Re-measure on a non-literary corpus**: the Hybrid 0.3 win here may not transfer
 
 ## License
 
