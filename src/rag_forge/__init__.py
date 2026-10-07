@@ -1,4 +1,4 @@
-"""RAG Forge: Production-grade RAG document QA with rigorous evaluation."""
+"""RAG Forge: retrieval eval forge with BM25, dense, hybrid, and rerank baselines."""
 
 from rag_forge.config import Settings
 from rag_forge.pipeline.rag import RAGPipeline
