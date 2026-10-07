@@ -144,12 +144,16 @@ RAG_FORGE_LLM_MAX_TOKENS=256 python scripts/run_eval.py \
 
 ### Start Web UI
 
-```bash
-# Start the FastAPI server
-rag-forge serve --port 8000
+Default LLM mode is `offline` (no API key). Ingest first so `/health` reports indexed chunks.
 
-# Open http://localhost:8000 in your browser
+```bash
+rag-forge ingest --data-dir data --retrieval hybrid
+rag-forge serve --port 8000
 ```
+
+Open http://localhost:8000. Screenshot: a real local run of the dataset question *"What is the famous opening line of Pride and Prejudice?"* (hybrid retrieval, offline template generation, 1,603 chunks). The top source contains the gold quote. The template extracts sentences from retrieved chunks; it is not a fluent generator.
+
+![Offline web UI answering "What is the famous opening line of Pride and Prejudice?" with the gold opening sentence cited from the novel](docs/ui-offline-query.png)
 
 ## Evaluation Results
 
@@ -302,7 +306,8 @@ rag-forge/
 │   ├── run_eval.py           # Run evaluation harness
 │   └── plot_eval_results.py  # Chart from eval JSON
 ├── docs/
-│   └── offline_retrieval_metrics.png
+│   ├── offline_retrieval_metrics.png
+│   └── ui-offline-query.png  # Offline web UI screenshot
 ├── data/
 │   └── qa_dataset.json   # 76-question evaluation set
 ├── results/
