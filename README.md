@@ -1,8 +1,8 @@
 # RAG Forge
 
-[![CI](https://github.com/SmitHunter/rag-forge/actions/workflows/ci.yml/badge.svg)](https://github.com/SmitHunter/rag-forge/actions/workflows/ci.yml)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://img.shields.io/github/actions/workflow/status/SmitHunter/rag-forge/ci.yml?branch=main&label=CI&style=flat)](https://github.com/SmitHunter/rag-forge/actions/workflows/ci.yml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue?style=flat)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat)](LICENSE)
 
 ![Grouped bar chart of Recall@1, Recall@5, and MRR for six retrieval configs, with average query latency on a second axis](docs/offline_retrieval_metrics.png)
 
@@ -436,10 +436,5 @@ Potential improvements for future work:
 
 MIT License - see [LICENSE](LICENSE) for details.
 
-## Author
-
-**Hunter Smith** — AI Engineer, Australia
-
-Repository: [github.com/SmitHunter/rag-forge](https://github.com/SmitHunter/rag-forge)
-
-Built to demonstrate production-ready AI engineering practices: clean package structure, pluggable providers, mocked tests, and a measured evaluation harness.
+---
+Built by **Hunter Smith**, AI Engineer, Melbourne · [GitHub](https://github.com/SmitHunter) · [LinkedIn](https://www.linkedin.com/in/hunter-sm/)
