@@ -24,7 +24,7 @@ Measures how chunking, BM25 vs dense vs hybrid retrieval, and cross-encoder rera
   </picture>
 </p>
 
-<p align="center"><sub>Offline retrieval eval · 76 questions · MiniLM embeddings · 4-core CPU, no GPU · data: <a href="results/offline_eval.json"><code>results/offline_eval.json</code></a></sub></p>
+<p align="center"><sub>Offline retrieval eval · 76 questions · MiniLM embeddings · latency from a one-time 4-core CPU, no-GPU run (CPU model is not in the JSON) · data: <a href="results/offline_eval.json"><code>results/offline_eval.json</code></a></sub></p>
 
 | Setup | Recall@1 | MRR | Latency |
 |-------|----------|-----|---------|
@@ -37,9 +37,9 @@ Measures how chunking, BM25 vs dense vs hybrid retrieval, and cross-encoder rera
 - **Corpus:** 5 public-domain novels, 1,603 chunks after front-matter stripping, 76 QA pairs
 - **Embeddings:** SentenceTransformers `all-MiniLM-L6-v2`
 - **Generation:** offline template (retrieval-only baseline)
-- **Hardware:** 4-core Intel Xeon, no GPU · raw output: [`results/offline_eval.json`](results/offline_eval.json)
+- **Hardware (not recorded in the committed JSON):** 4-core Intel Xeon, no GPU · raw output: [`results/offline_eval.json`](results/offline_eval.json)
 
-Rerank latency is machine-dependent: 285–315ms here vs 252–262ms in the earlier write-up. Hybrid (BM25=0.5) first-stage latency rounded to 9ms (was 8ms).
+Latency is CPU-bound and machine-dependent; quality metrics are deterministic.
 
 | Configuration | Recall@1 | Recall@5 | MRR | Faithfulness | Latency |
 |---------------|----------|----------|-----|--------------|---------|
@@ -56,7 +56,7 @@ Rerank latency is machine-dependent: 285–315ms here vs 252–262ms in the earl
 
 **Coverage and precision still trade off.** Hybrid (BM25=0.5) has the best Recall@5 (0.971) but a weaker Recall@1 (0.838). If users see only the top hit, prefer Hybrid 0.3 (or dense + rerank). If they can scan a short list, Hybrid 0.5 covers more gold documents.
 
-**Reranking now helps a little, at a cost.** Dense + rerank and Hybrid + rerank match the best Recall@1 (0.868) and take the best MRR (0.946), with faithfulness 0.817 / 0.810. They add 285–315ms on this CPU. On the previous (front-matter-included) ingest, rerank did not help — another reminder to re-measure after corpus cleanup.
+**Reranking helps a little, at a cost.** Dense + rerank and Hybrid + rerank match the best Recall@1 (0.868) and take the best MRR (0.946), with faithfulness 0.817 / 0.810. They add 285–315ms on this CPU.
 
 **Faithfulness is stable across configurations (~0.80) in the offline table.** That is mechanical: the template extracts sentences from context, so n-gram overlap is high. It is not evidence of fluent generation.
 
@@ -75,7 +75,7 @@ Rerank latency is machine-dependent: 285–315ms here vs 252–262ms in the earl
 <details>
 <summary><b>Generated-answer results (llama3.2:1b, local CPU)</b></summary>
 
-Same 76-question set and cleaned corpus, retrieve + generate through Ollama. Model: `llama3.2:1b` (1.2B parameters, Q8_0). Hardware: 4-core Intel Xeon, no discrete GPU (`nvidia-smi` not present, no `/dev/dri`). `RAG_FORGE_LLM_MAX_TOKENS=256`. Command:
+Same 76-question set and cleaned corpus, retrieve + generate through Ollama. Model: `llama3.2:1b` (1.2B parameters, Q8_0). Hardware (not recorded in committed files): 4-core Intel Xeon, no discrete GPU (`nvidia-smi` not present, no `/dev/dri`). `RAG_FORGE_LLM_MAX_TOKENS=256`. Command:
 
 ```bash
 RAG_FORGE_LLM_MAX_TOKENS=256 python scripts/run_eval.py \
@@ -88,7 +88,7 @@ RAG_FORGE_LLM_MAX_TOKENS=256 python scripts/run_eval.py \
 | Dense Only | 0.853 | 0.963 | 0.933 | 0.151 | 0.168 | 0.875 | 15187ms |
 | Hybrid (BM25=0.3) | 0.868 | 0.963 | 0.940 | 0.187 | 0.163 | 0.625 | 13382ms |
 
-No raw JSON for this table is in the repo. This VM does not have Ollama, so the `llama3.2:1b` run was not repeated.
+These generation scores are not reproducible from committed files: raw JSON for this run is not committed. The run needs a local Ollama install and was done once on the hardware above.
 
 Retrieval scores match the offline table (same retriever, same ingest). Generation changes the answer metrics:
 
@@ -97,7 +97,7 @@ Retrieval scores match the offline table (same retriever, same ingest). Generati
 - **Abstention is 0.875 (Dense) vs 0.625 (Hybrid 0.3)** on the 8 unanswerable questions. Dense still refuses more often.
 - **Latency is 13.4–15.2s per query** (13382ms / 15187ms). Almost all of that is local generation, not retrieval.
 
-These two configs are the best first-stage setups in the new offline table. The other four were not re-run with the local model.
+These two configs are the best first-stage setups in the offline table. The other four were not re-run with the local model.
 
 </details>
 
@@ -185,12 +185,17 @@ flowchart TB
 git clone https://github.com/SmitHunter/rag-forge.git
 cd rag-forge
 
+python3 -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+
 # Install with pip (Python 3.10+)
 pip install -e ".[dev]"
 
 # For OpenAI/Anthropic support:
 pip install -e ".[all]"
 ```
+
+On Linux without a GPU, install CPU torch first so pip does not pull a multi-GB CUDA wheel: `pip install torch --index-url https://download.pytorch.org/whl/cpu`. Then run the install commands above.
 
 ### Download sample data
 
@@ -204,7 +209,7 @@ This downloads 5 classic novels (~3MB of text). The curated 76-question QA set i
 
 ### Query (offline)
 
-Default LLM mode is `offline`: a deterministic template that extracts sentences from retrieved chunks. No API keys, no model download. This is the retrieval-only baseline used in the eval table below.
+Default LLM mode is `offline`: a deterministic template that extracts sentences from retrieved chunks. No API keys. The first ingest downloads the ~90 MB all-MiniLM-L6-v2 embedding model from Hugging Face. This is the retrieval-only baseline in the Results table above.
 
 ```bash
 # Ingest documents and build index (Hybrid BM25=0.3 — best first-stage)
@@ -214,8 +219,8 @@ rag-forge ingest --data-dir data --retrieval hybrid
 rag-forge query "What is the opening line of Pride and Prejudice?"
 
 # Same hybrid index can be queried with a single-method retriever
-rag-forge query "How did Frankenstein create his monster?" --retrieval bm25
-rag-forge query "What is Sherlock Holmes's address?" --retrieval dense
+rag-forge query "What card soldiers are painting the roses in Wonderland?" --retrieval bm25
+rag-forge query "How does Alice enter Wonderland?" --retrieval dense
 ```
 
 ### Web UI
@@ -308,7 +313,7 @@ export RAG_FORGE_USE_RERANKING=true
 | `ollama_host` | URL | `http://localhost:11434` |
 | `chunking_strategy` | `fixed_size`, `sentence`, `paragraph`, `semantic` | `fixed_size` |
 | `retrieval_strategy` | `bm25`, `dense`, `hybrid` | `hybrid` (BM25 weight 0.3 — best first-stage) |
-| `use_reranking` | `true`, `false` | `false` (on here, rerank ties R@1 and wins MRR at 285–315ms) |
+| `use_reranking` | `true`, `false` | `false` (enabling it ties best R@1 and gives best MRR, +285–315ms) |
 | `chunk_size` | int (tokens) | `512` |
 | `retrieval_top_k` | int | `5` |
 
@@ -406,7 +411,7 @@ pytest tests/ --cov=rag_forge --cov-report=html
 - **Generated-answer scores are from `llama3.2:1b` on CPU**, not from CI. GitHub Actions does not install Ollama; local-provider tests mock HTTP. Larger models would change correctness and latency.
 - **Faithfulness is n-gram overlap**, not an NLI/LLM-as-judge score. Correctness (token F1 vs gold) is computed internally but omitted from the public table because the template is not a real generator.
 - **Corpus is tiny and literary.** Five public-domain novels. Hybrid 0.3 winning first-stage here does not imply it wins on technical docs, logs, or code.
-- **Reranker result is dataset-specific.** After front-matter stripping, rerank ties best R@1 (0.868) and wins MRR (0.946 vs 0.940 first-stage) at 285–315ms on this 4-core Xeon. On the previous dirty ingest it did not help. Measure again if the corpus changes.
+- **Reranker result is dataset-specific.** After front-matter stripping, rerank ties best R@1 (0.868) and wins MRR (0.946 vs 0.940 first-stage) at 285–315ms on this 4-core Xeon (CPU model is not in the committed JSON). Measure again if the corpus changes.
 - **Demo server is not production-hardened.** FastAPI binds to localhost, uses a process-global pipeline, and has no auth. Citation HTML is escaped; treat it as a local demo.
 - **API keys stay in the environment.** Nothing is committed. `.env` is gitignored. Do not put secrets in CLI history on a shared machine.
 - **Chunking default is fixed-size 512 tokens.** Semantic chunking exists but is slower and not in the published eval.
